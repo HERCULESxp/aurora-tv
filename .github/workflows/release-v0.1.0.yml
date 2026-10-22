@@ -1,0 +1,50 @@
+name: Publish v0.1.0
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/release-v0.1.0.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: release-v0.1.0
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download verified APK
+        uses: actions/download-artifact@v4
+        with:
+          name: aurora-tv-debug
+          path: dist
+          repository: HERCULESxp/aurora-tv
+          run-id: 39790290844
+          github-token: ${{ github.token }}
+      - name: Prepare public download
+        run: |
+          mv dist/app-debug.apk dist/aurora-tv-0.1.0.apk
+          cd dist
+          sha256sum aurora-tv-0.1.0.apk > SHA256SUMS.txt
+          cat > release-notes.md <<'NOTES'
+          Primeira versão de teste do Aurora TV para Android / Fire OS.
+
+          Interface escura em português, menu lateral, favoritos, busca e histórico local de apps. Sem anúncios ou permissão de internet.
+
+          Baixe aurora-tv-0.1.0.apk em Assets e instale por ADB ou pelo instalador do dispositivo.
+
+          APK debug da execução validada 39790290844, commit e4775710292b6219b0059eed1bec87eeb0c7d6f5. Compilação, testes do histórico e Android Lint aprovados. Ainda não testado em Fire Stick; esta versão não garante substituir o botão Home em versões que bloqueiam launchers alternativos. Não compatível com Vega OS.
+
+          Instruções: https://github.com/HERCULESxp/aurora-tv/blob/main/docs/INSTALACAO.md
+          NOTES
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: HERCULESxp/aurora-tv
+        run: |
+          if gh release view v0.1.0 >/dev/null 2>&1; then
+            echo 'Release v0.1.0 already exists; leaving it unchanged.'
+            exit 0
+          fi
+          gh release create v0.1.0 dist/aurora-tv-0.1.0.apk dist/SHA256SUMS.txt --target e4775710292b6219b0059eed1bec87eeb0c7d6f5 --title 'Aurora TV v0.1.0 — versão de teste' --notes-file dist/release-notes.md --prerelease
