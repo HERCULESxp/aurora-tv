@@ -2,7 +2,11 @@
 
 Launcher Android para Fire TV, com interface em português, sem anúncios e sem rastreamento. Inspirado no layout de referência: menu lateral, destaque panorâmico, fundo escuro e fileiras de aplicativos. O destaque usa uma paisagem original desenhada no dispositivo.
 
-**Estado: primeira implementação, ainda sem compilação Android ou teste em Fire Stick.** O workflow de CI está configurado para compilar e executar lint; confirme uma execução verde antes de instalar.
+**Estado: APK de desenvolvimento compilado, testes do histórico e Android Lint aprovados no GitHub Actions.** Ainda não testado em Fire Stick.
+
+[Baixar APK de teste (ZIP)](https://github.com/HERCULESxp/aurora-tv/actions/runs/39790290844/artifacts/12430792306) · [Execução validada](https://github.com/HERCULESxp/aurora-tv/actions/runs/39790290844)
+
+É necessário estar conectado ao GitHub para baixar o artefato. Descompacte o ZIP para obter `app-debug.apk`.
 
 ## Funcionalidades
 

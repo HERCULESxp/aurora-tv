@@ -6,9 +6,19 @@
 - Leitura sintática dos recursos e manifesto XML, workflow YAML e fontes Java (sem resolução de tipos Android).
 - Revisão de compatibilidade com API 22: ordenação usa `Collections.sort`, evitando `List.sort` de API 24.
 
+## Executado no GitHub Actions
+
+[Execução aprovada](https://github.com/HERCULESxp/aurora-tv/actions/runs/39790290844), commit `e4775710292b6219b0059eed1bec87eeb0c7d6f5`:
+
+- Quatro verificações do histórico aprovadas.
+- `:app:assembleDebug` e `:app:lintDebug` concluídos com sucesso.
+- APK debug gerado e publicado como artefato `aurora-tv-debug`.
+
+Foram corrigidos o pacote obsoleto `tools` na instalação do SDK e o atributo `windowLightStatusBar`, incompatível com API 22.
+
 ## Ainda não executado
 
-O ambiente não dispõe de Android SDK nem Gradle. O download do SDK não foi autorizado/concluído nesta sessão. Portanto não foi possível gerar APK, executar Android Lint, verificar o layout em emulador ou testar em Fire TV. O workflow incluído fará build e lint quando executado no GitHub.
+Não foi verificado o layout em emulador nem o funcionamento em Fire TV. Lint aprovado não substitui teste no aparelho.
 
 ## Roteiro para aparelho / emulador
 
