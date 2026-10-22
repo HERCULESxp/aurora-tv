@@ -226,14 +226,44 @@ public class MainActivity extends Activity {
         try { startActivity(intent); } catch (RuntimeException e) { Toast.makeText(this, "Esta opção não está disponível nesta versão do sistema.", Toast.LENGTH_LONG).show(); }
     }
     private void settings() {
-        new AlertDialog.Builder(this).setTitle("Aurora TV").setItems(new String[]{"Configurações do dispositivo", "Escolher app de início", "Limpar apps recentes", "Sobre"}, (d, which) -> {
+        new AlertDialog.Builder(this).setTitle("Aurora TV").setItems(new String[]{"Configurações do dispositivo", "Escolher app de início", "Limpar apps recentes", "Botão Home e inicialização", "Sobre"}, (d, which) -> {
             if (which == 0) safeStart(new Intent(Settings.ACTION_SETTINGS));
             else if (which == 1) safeStart(new Intent(Settings.ACTION_HOME_SETTINGS));
             else if (which == 2) { prefs.edit().remove("recent").apply(); render(); }
-            else new AlertDialog.Builder(this).setTitle("Aurora TV · 0.1.0")
+            else if (which == 3) redirectSettings();
+            else new AlertDialog.Builder(this).setTitle("Aurora TV · 0.2.0")
                 .setMessage("Uma tela inicial leve, privada e sem anúncios.\n\nFavoritos e apps recentes ficam somente neste dispositivo.\n\nAlgumas versões do Fire OS bloqueiam a troca do launcher e o botão Home. O Aurora não altera nem desativa o launcher da Amazon.")
                 .setPositiveButton("Entendi", null).show();
         }).show();
+    }
+    private void redirectSettings() {
+        boolean redirect = prefs.getBoolean("redirect_home", false);
+        boolean boot = prefs.getBoolean("open_at_boot", false);
+        android.view.accessibility.AccessibilityManager manager =
+            (android.view.accessibility.AccessibilityManager)getSystemService(ACCESSIBILITY_SERVICE);
+        boolean serviceEnabled = false;
+        for (android.accessibilityservice.AccessibilityServiceInfo info : manager.getEnabledAccessibilityServiceList(
+                android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_ALL_MASK)) {
+            android.content.pm.ServiceInfo service = info.getResolveInfo().serviceInfo;
+            if (getPackageName().equals(service.packageName) && HomeRedirectService.class.getName().equals(service.name)) serviceEnabled = true;
+        }
+        String status = "Redirecionar Home: " + (redirect ? "ligado" : "desligado")
+            + "\nServiço de acessibilidade: " + (serviceEnabled ? "habilitado" : "não habilitado")
+            + "\nInício da Amazon identificado: " + (prefs.getBoolean("home_detected", false) ? "sim" : "ainda não")
+            + "\nAbrir ao ligar: " + (boot ? "ligado" : "desligado")
+            + "\n\n" + prefs.getString("redirect_notice", "Algumas versões do Fire OS bloqueiam este recurso.");
+        new AlertDialog.Builder(this).setTitle("Home e inicialização")
+            .setItems(new String[]{redirect ? "Desligar redirecionamento Home" : "Ativar redirecionamento Home",
+                "Abrir acessibilidade do sistema", boot ? "Desligar abertura ao ligar" : "Abrir Aurora ao ligar", "Ver estado e diagnóstico"}, (d, which) -> {
+                if (which == 0 && redirect) prefs.edit().putBoolean("redirect_home", false).apply();
+                else if (which == 0) new AlertDialog.Builder(this).setTitle("Redirecionar a tela inicial?")
+                    .setMessage("O serviço detecta apenas o nome da janela inicial da Amazon e abre o Aurora. Não lê conteúdo da tela, não captura teclas e não envia dados. Você também precisa habilitar Aurora — redirecionar início na acessibilidade do sistema.\n\nA tela Amazon pode aparecer brevemente. Se o sistema insistir em voltar para ela, o redirecionamento será pausado automaticamente. Você pode desligar aqui a qualquer momento.")
+                    .setNegativeButton("Cancelar", null)
+                    .setPositiveButton("Ativar", (dialog, w) -> { prefs.edit().putBoolean("redirect_home", true).remove("redirect_notice").apply(); safeStart(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)); }).show();
+                else if (which == 1) safeStart(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+                else if (which == 2) { prefs.edit().putBoolean("open_at_boot", !boot).apply(); Toast.makeText(this, boot ? "Abertura ao ligar desligada" : "Abertura ao ligar ativada; depende do Fire OS", Toast.LENGTH_LONG).show(); }
+                else new AlertDialog.Builder(this).setTitle("Estado do redirecionamento").setMessage(status).setPositiveButton("OK", null).show();
+            }).setNegativeButton("Fechar", null).show();
     }
     @Override public void onBackPressed() {
         if (!section.equals("Início")) { section = "Início"; query = ""; render(); }

@@ -34,3 +34,10 @@ Não foi verificado o layout em emulador nem o funcionamento em Fire TV. Lint ap
 10. Testar Configurações e Escolher app de início, incluindo versões que não oferecem esse seletor.
 11. Confirmar comportamento do botão Home no Fire OS, sem desativar o launcher original.
 12. Limpar histórico e conferir estado vazio.
+
+
+## Validação adicional 0.2.0
+
+- Teste `RedirectGuardTest`: nove verificações cobrindo recurso desligado, janela não reconhecida, intervalo mínimo, limite de tentativas e recuperação após a janela de tempo.
+- No aparelho: habilitar/desabilitar o serviço; conferir diagnóstico; pressionar Home de apps diferentes; confirmar que configurações Amazon não causam redirecionamento; testar pausa por repetição; reiniciar com abertura ao ligar ligada/desligada; testar recuperação por force-stop.
+- Ainda não validado em Fire Stick físico. Serviço habilitado não comprova que o firmware permite abertura em segundo plano.

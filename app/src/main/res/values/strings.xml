@@ -1,0 +1,4 @@
+<resources>
+    <string name="home_service_label">Aurora — redirecionar início</string>
+    <string name="home_service_description">Quando ativado no Aurora, detecta a atividade de início da Amazon e abre o Aurora. Observa somente o nome do pacote e da janela, sem ler textos da tela, teclas ou conteúdo de outros apps. Não envia dados. Pode ser desativado a qualquer momento nas configurações do Aurora ou de acessibilidade.</string>
+</resources>

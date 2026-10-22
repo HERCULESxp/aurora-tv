@@ -2,7 +2,7 @@
 
 Launcher Android para Fire TV, com interface em português, sem anúncios e sem rastreamento. Inspirado no layout de referência: menu lateral, destaque panorâmico, fundo escuro e fileiras de aplicativos. O destaque usa uma paisagem original desenhada no dispositivo.
 
-**Estado: APK de desenvolvimento compilado, testes do histórico e Android Lint aprovados no GitHub Actions.** Ainda não testado em Fire Stick.
+**Estado:** versão 0.1.0 compilada e validada no CI; versão 0.2.0 adiciona Home/inicialização e será disponibilizada na Release após build, testes e lint. Ainda não testado em Fire Stick.
 
 [Baixar APK de teste (ZIP)](https://github.com/HERCULESxp/aurora-tv/actions/runs/39790290844/artifacts/12430792306) · [Execução validada](https://github.com/HERCULESxp/aurora-tv/actions/runs/39790290844)
 
@@ -16,6 +16,7 @@ Launcher Android para Fire TV, com interface em português, sem anúncios e sem 
 - Últimos 12 aplicativos abertos pelo Aurora, salvos localmente.
 - Busca por nome, relógio e acesso às configurações do sistema.
 - Registro como aplicativo HOME e como app de TV.
+- 0.2.0: redirecionamento opcional da janela inicial Amazon via acessibilidade, proteção contra ciclos e tentativa opcional de abertura ao ligar.
 - Sem permissão de internet, anúncios, analytics ou dependência de serviços Google.
 
 O Aurora não agrega catálogos de streaming, não reproduz filmes e não acessa o progresso privado de Netflix, Prime Video ou outros serviços. “Recentes” lista apps abertos pelo launcher, não episódios assistidos. Os ícones vêm dos aplicativos instalados. A imagem de referência não é distribuída no projeto.
@@ -50,7 +51,7 @@ Teste independente do Android SDK:
 
 Veja [o guia de instalação](docs/INSTALACAO.md). O APK exige um dispositivo Android/Fire OS com API 22 ou superior. Dispositivos com Vega OS não executam este APK.
 
-**Instalar o app não garante substituir o botão Home.** A Amazon bloqueia launchers alternativos em diversas versões do Fire OS. O Aurora registra a intenção HOME padrão do Android, mas não contorna esses bloqueios. Não desative nem desinstale o launcher da Amazon para experimentar este projeto.
+**Instalar o app não garante substituir o botão Home.** A Amazon bloqueia launchers alternativos em diversas versões do Fire OS. O Aurora registra a intenção HOME padrão do Android e oferece redirecionamento experimental via acessibilidade. Esse método depende de o Fire OS permitir o serviço e a abertura de atividades; não remove os bloqueios do sistema. Não desative nem desinstale o launcher da Amazon para experimentar este projeto.
 
 ## Estrutura
 
