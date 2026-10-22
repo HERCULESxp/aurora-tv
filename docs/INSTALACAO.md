@@ -93,3 +93,16 @@ A versão 0.2.1 remove a espera de agrupamento de 150 ms dos eventos de acessibi
 Teste Home após ficar 20 segundos parado e depois teste duas pressões separadas por 1 segundo. Compare com a 0.2.0. Evite muitas pressões seguidas: a proteção de três tentativas por 15 segundos continua ativa. Se pausar, reative pelo Aurora e espere 15 segundos antes do próximo teste.
 
 Também confira: Home estando na busca/favoritos retorna ao Início; abrir e voltar de outro aplicativo atualiza Recentes; configurações e boot continuam funcionando. O atraso do Fire OS ao emitir eventos não é removido por essas mudanças. A redução real precisa ser medida no aparelho.
+
+
+## Configurações do Fire TV — 0.2.2
+
+Abrir qualquer configuração pelo Aurora pausa o redirecionamento. A pausa não expira e não é removida simplesmente ao retornar ao app: escolha **Configurações → Retomar redirecionamento Home** quando terminar. Na primeira habilitação do serviço, abrir a acessibilidade também pausa Home; retome depois de habilitar. A abertura ao ligar respeita essa pausa.
+
+Para entrar nas configurações pelo menu nativo/controle remoto, escolha antes **Pausar Home para usar a Amazon**. Não é possível distinguir todas as páginas internas da Amazon somente pelo nome da atividade; esta versão não afirma detectar automaticamente essas páginas.
+
+### “App não instalado”
+
+Os APKs atuais usam assinatura debug gerada no runner. Builds diferentes podem usar certificados diferentes, impedindo atualização sobre o app instalado. Uma mensagem genérica não comprova a causa; instalação por ADB fornece o erro específico, por exemplo `INSTALL_FAILED_UPDATE_INCOMPATIBLE`.
+
+Nesse erro, é necessário desinstalar o antigo e instalar o novo, perdendo preferências e habilitação do serviço. Para atualizações futuras sem desinstalar, ainda é necessário configurar uma chave de assinatura permanente em armazenamento privado e usá-la no CI. Não coloque keystores ou senhas no repositório público. Esta versão corrige o acesso às configurações, mas não recupera as chaves debug de runners anteriores.

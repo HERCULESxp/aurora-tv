@@ -8,6 +8,7 @@ import android.content.Intent;
 public class BootReceiver extends BroadcastReceiver {
     @Override public void onReceive(Context context, Intent intent) {
         if (!Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) return;
+        if (context.getSharedPreferences("aurora", Context.MODE_PRIVATE).getBoolean("settings_pause", false)) return;
         if (!context.getSharedPreferences("aurora", Context.MODE_PRIVATE).getBoolean("open_at_boot", false)) return;
         try {
             context.startActivity(new Intent(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));

@@ -38,6 +38,7 @@ public class HomeRedirectService extends AccessibilityService {
         String pkg = event.getPackageName() == null ? "" : event.getPackageName().toString();
         String activity = event.getClassName() == null ? "" : event.getClassName().toString();
         SharedPreferences prefs = getSharedPreferences("aurora", MODE_PRIVATE);
+        if (prefs.getBoolean("settings_pause", false)) return;
         boolean home = AMAZON.equals(pkg) && homeActivities.contains(activity);
         RedirectGuard.Decision decision = guard.decide(SystemClock.elapsedRealtime(), prefs.getBoolean("redirect_home", false), home);
         if (decision == RedirectGuard.Decision.PAUSE) {

@@ -1,0 +1,56 @@
+name: Publish v0.2.2
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/release-v0.2.2.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools platforms;android-35 build-tools;34.0.0
+          log-accepted-android-sdk-licenses: false
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - run: ./tests/run.sh
+      - run: gradle --no-daemon :app:assembleDebug :app:lintDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aurora-tv-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Publish tested APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: HERCULESxp/aurora-tv
+        run: |
+          mkdir -p release
+          cp app/build/outputs/apk/debug/app-debug.apk release/aurora-tv-0.2.2.apk
+          cd release
+          sha256sum aurora-tv-0.2.2.apk > SHA256SUMS.txt
+          cat > notes.md <<'NOTES'
+          Correção: abrir configurações pelo Aurora pausa o redirecionamento Home até você escolher Retomar redirecionamento Home no menu. Inclui pausa manual para acessar as telas Amazon pelo controle. A pausa persiste, inclusive ao reiniciar. Não depende de um temporizador que possa fechar as configurações durante o uso.
+
+          Ative em Configurações → Botão Home e inicialização. O serviço precisa ser habilitado também na acessibilidade do sistema. As duas opções vêm desligadas. Há proteção contra ciclos e diagnóstico no app. Não lê conteúdo da tela ou teclas, nem envia dados.
+
+          A compatibilidade depende do firmware: não foi testado em Fire Stick físico e não há garantia de funcionamento no Fire OS 7.7.1.6. O sistema pode bloquear acessibilidade ou abertura em segundo plano. O launcher Amazon permanece instalado e habilitado.
+
+          APK debug: se a atualização acusar assinatura incompatível, desinstale a versão anterior e instale esta (apaga as preferências). Compilação, testes Java e Android Lint aprovados nesta execução antes da publicação.
+
+          Instalação, ativação e recuperação: https://github.com/HERCULESxp/aurora-tv/blob/main/docs/INSTALACAO.md
+          NOTES
+          if gh release view v0.2.2 >/dev/null 2>&1; then
+            echo 'Release already exists; leaving it unchanged.'
+            exit 0
+          fi
+          gh release create v0.2.2 aurora-tv-0.2.2.apk SHA256SUMS.txt --target "$GITHUB_SHA" --title 'Aurora TV v0.2.2 — Pausa para configurações (experimental)' --notes-file notes.md --prerelease

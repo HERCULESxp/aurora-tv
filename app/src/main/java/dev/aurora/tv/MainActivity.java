@@ -233,15 +233,29 @@ public class MainActivity extends Activity {
         }).show();
     }
     private void safeStart(Intent intent) {
-        try { startActivity(intent); externalAppOpened = true; } catch (RuntimeException e) { Toast.makeText(this, "Esta opção não está disponível nesta versão do sistema.", Toast.LENGTH_LONG).show(); }
+        boolean wasPaused = prefs.getBoolean("settings_pause", false);
+        // Fire TV settings can share the launcher's HOME activity.
+        prefs.edit().putBoolean("settings_pause", true).apply();
+        try {
+            startActivity(intent); externalAppOpened = true;
+            Toast.makeText(this, "Home pausado para usar as configurações. Retome no menu do Aurora ao terminar.", Toast.LENGTH_LONG).show();
+        } catch (RuntimeException e) {
+            prefs.edit().putBoolean("settings_pause", wasPaused).apply();
+            Toast.makeText(this, "Esta opção não está disponível nesta versão do sistema.", Toast.LENGTH_LONG).show();
+        }
     }
     private void settings() {
-        new AlertDialog.Builder(this).setTitle("Aurora TV").setItems(new String[]{"Configurações do dispositivo", "Escolher app de início", "Limpar apps recentes", "Botão Home e inicialização", "Sobre"}, (d, which) -> {
+        new AlertDialog.Builder(this).setTitle("Aurora TV").setItems(new String[]{"Configurações do dispositivo", "Escolher app de início", "Limpar apps recentes", "Botão Home e inicialização", prefs.getBoolean("settings_pause", false) ? "Retomar redirecionamento Home" : "Pausar Home para usar a Amazon", "Sobre"}, (d, which) -> {
             if (which == 0) safeStart(new Intent(Settings.ACTION_SETTINGS));
             else if (which == 1) safeStart(new Intent(Settings.ACTION_HOME_SETTINGS));
             else if (which == 2) { prefs.edit().remove("recent").apply(); render(); }
             else if (which == 3) redirectSettings();
-            else new AlertDialog.Builder(this).setTitle("Aurora TV · 0.2.1")
+            else if (which == 4) {
+                boolean pause = !prefs.getBoolean("settings_pause", false);
+                prefs.edit().putBoolean("settings_pause", pause).apply();
+                Toast.makeText(this, pause ? "Home pausado; configurações Amazon liberadas" : "Pausa removida; confira se Redirecionar Home está ligado", Toast.LENGTH_LONG).show();
+            }
+            else new AlertDialog.Builder(this).setTitle("Aurora TV · 0.2.2")
                 .setMessage("Uma tela inicial leve, privada e sem anúncios.\n\nFavoritos e apps recentes ficam somente neste dispositivo.\n\nAlgumas versões do Fire OS bloqueiam a troca do launcher e o botão Home. O Aurora não altera nem desativa o launcher da Amazon.")
                 .setPositiveButton("Entendi", null).show();
         }).show();
@@ -258,6 +272,7 @@ public class MainActivity extends Activity {
             if (getPackageName().equals(service.packageName) && HomeRedirectService.class.getName().equals(service.name)) serviceEnabled = true;
         }
         String status = "Redirecionar Home: " + (redirect ? "ligado" : "desligado")
+            + "\nPausa para configurações: " + (prefs.getBoolean("settings_pause", false) ? "sim — retome no menu do Aurora" : "não")
             + "\nServiço de acessibilidade: " + (serviceEnabled ? "habilitado" : "não habilitado")
             + "\nInício da Amazon identificado: " + (prefs.getBoolean("home_detected", false) ? "sim" : "ainda não")
             + "\nAbrir ao ligar: " + (boot ? "ligado" : "desligado")
