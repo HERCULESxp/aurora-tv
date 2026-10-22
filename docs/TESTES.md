@@ -41,3 +41,5 @@ Não foi verificado o layout em emulador nem o funcionamento em Fire TV. Lint ap
 - Teste `RedirectGuardTest`: nove verificações cobrindo recurso desligado, janela não reconhecida, intervalo mínimo, limite de tentativas e recuperação após a janela de tempo.
 - No aparelho: habilitar/desabilitar o serviço; conferir diagnóstico; pressionar Home de apps diferentes; confirmar que configurações Amazon não causam redirecionamento; testar pausa por repetição; reiniciar com abertura ao ligar ligada/desligada; testar recuperação por force-stop.
 - Ainda não validado em Fire Stick físico. Serviço habilitado não comprova que o firmware permite abertura em segundo plano.
+
+Build, 13 verificações Java, Android Lint e publicação da 0.2.0 aprovados na [execução 39807012550](https://github.com/HERCULESxp/aurora-tv/actions/runs/39807012550), commit `b03a6a60ba69b36be430c97a917877f44baee3cb`.

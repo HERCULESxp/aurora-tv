@@ -2,11 +2,11 @@
 
 Launcher Android para Fire TV, com interface em português, sem anúncios e sem rastreamento. Inspirado no layout de referência: menu lateral, destaque panorâmico, fundo escuro e fileiras de aplicativos. O destaque usa uma paisagem original desenhada no dispositivo.
 
-**Estado:** versão 0.1.0 compilada e validada no CI; versão 0.2.0 adiciona Home/inicialização e será disponibilizada na Release após build, testes e lint. Ainda não testado em Fire Stick.
+**Estado:** versão experimental 0.2.0 compilada, com 13 verificações Java e Android Lint aprovados. Ainda não testada em Fire Stick físico; funcionamento do redirecionamento depende do firmware.
 
-[Baixar APK de teste (ZIP)](https://github.com/HERCULESxp/aurora-tv/actions/runs/39790290844/artifacts/12430792306) · [Execução validada](https://github.com/HERCULESxp/aurora-tv/actions/runs/39790290844)
+[Baixar APK 0.2.0](https://github.com/HERCULESxp/aurora-tv/releases/download/v0.2.0/aurora-tv-0.2.0.apk) · [Release](https://github.com/HERCULESxp/aurora-tv/releases/tag/v0.2.0) · [Build validado](https://github.com/HERCULESxp/aurora-tv/actions/runs/39807012550)
 
-É necessário estar conectado ao GitHub para baixar o artefato. Descompacte o ZIP para obter `app-debug.apk`.
+Download público sem login. Para ativar Home e abertura ao ligar, veja [as instruções](docs/INSTALACAO.md#modo-experimental-home--inicialização-020).
 
 ## Funcionalidades
 
