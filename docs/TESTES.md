@@ -43,3 +43,8 @@ Não foi verificado o layout em emulador nem o funcionamento em Fire TV. Lint ap
 - Ainda não validado em Fire Stick físico. Serviço habilitado não comprova que o firmware permite abertura em segundo plano.
 
 Build, 13 verificações Java, Android Lint e publicação da 0.2.0 aprovados na [execução 39807012550](https://github.com/HERCULESxp/aurora-tv/actions/runs/39807012550), commit `b03a6a60ba69b36be430c97a917877f44baee3cb`.
+
+
+## 0.2.1 — latência experimental
+
+Os nove testes de RedirectGuard cobrem os novos limites de 349/350 ms, três tentativas em 15 s e pausa na quarta. Manter teste físico do Home após espera e em sequência, retorno de apps, atualização de Recentes e retorno de outras seções ao Início. Ainda sem medida de ganho no aparelho.

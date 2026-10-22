@@ -63,7 +63,7 @@ A desinstalação remove favoritos e histórico. Desative a Depuração ADB quan
 
 O serviço observa somente eventos de mudança de janela do pacote `com.amazon.tv.launcher`, e só reage às classes de atividade registradas como HOME desse pacote. Não lê árvores de interface, textos de tela, teclas, credenciais ou conteúdo de outros aplicativos. Sem internet ou envio de eventos. Uma variante do firmware que reporte outra janela pode não ser reconhecida; não há fallback que intercepte indiscriminadamente o pacote todo.
 
-O redirecionamento tem intervalo mínimo de 2 segundos. Após três tentativas em 15 segundos, uma quarta tentativa pausa o recurso. Se Home deixar de redirecionar após várias pressões rápidas, confira o diagnóstico e reative a opção. Essa proteção também evita ciclos se o Fire OS reabrir insistentemente a Amazon.
+O redirecionamento tem intervalo mínimo de 350 ms (desde a versão 0.2.1). Após três tentativas em 15 segundos, uma quarta tentativa pausa o recurso. Se Home deixar de redirecionar após várias pressões rápidas, confira o diagnóstico e reative a opção. Essa proteção também evita ciclos se o Fire OS reabrir insistentemente a Amazon.
 
 ### Desativar / recuperar
 
@@ -84,3 +84,12 @@ Se o Fire OS ocultar ou bloquear o serviço de acessibilidade, informe o modelo 
 ### Atualizar o APK de teste
 
 As versões de desenvolvimento podem ter certificados diferentes por serem geradas em runners distintos. Se ocorrer `INSTALL_FAILED_UPDATE_INCOMPATIBLE`, desinstale a versão anterior e instale a nova. Isso apaga favoritos, histórico e opções; será necessário habilitar o serviço novamente. Não desinstale o launcher da Amazon.
+
+
+## Comparar o tempo do Home na versão 0.2.1
+
+A versão 0.2.1 remove a espera de agrupamento de 150 ms dos eventos de acessibilidade, reduz o intervalo mínimo entre tentativas de 2 s para 350 ms e reutiliza a tela inicial já montada quando possível. Retornos de aplicativos abertos pelo Aurora ainda atualizam a lista e o histórico. Não captura nem bloqueia a tecla Home.
+
+Teste Home após ficar 20 segundos parado e depois teste duas pressões separadas por 1 segundo. Compare com a 0.2.0. Evite muitas pressões seguidas: a proteção de três tentativas por 15 segundos continua ativa. Se pausar, reative pelo Aurora e espere 15 segundos antes do próximo teste.
+
+Também confira: Home estando na busca/favoritos retorna ao Início; abrir e voltar de outro aplicativo atualiza Recentes; configurações e boot continuam funcionando. O atraso do Fire OS ao emitir eventos não é removido por essas mudanças. A redução real precisa ser medida no aparelho.

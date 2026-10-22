@@ -16,6 +16,14 @@ public class HomeRedirectService extends AccessibilityService {
     private final RedirectGuard guard = new RedirectGuard();
     @Override protected void onServiceConnected() {
         homeActivities.clear();
+        // Actual HOME window confirmed on the user's Fire OS 7.7.1.6.
+        try {
+            android.content.pm.ActivityInfo known = getPackageManager().getActivityInfo(
+                new android.content.ComponentName(AMAZON, AMAZON + ".ui.HomeActivity_vNext"), 0);
+            if (known.enabled && known.exported) homeActivities.add(known.name);
+        } catch (android.content.pm.PackageManager.NameNotFoundException ignored) {
+            // Other firmware versions use the HOME activities resolved below.
+        }
         Intent home = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).setPackage(AMAZON);
         for (ResolveInfo info : getPackageManager().queryIntentActivities(home, 0)) {
             if (info.activityInfo != null && AMAZON.equals(info.activityInfo.packageName)) {
@@ -37,7 +45,8 @@ public class HomeRedirectService extends AccessibilityService {
         } else if (decision == RedirectGuard.Decision.OPEN) {
             try {
                 startActivity(new Intent(this, MainActivity.class)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    .putExtra("aurora_home_redirect", true)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION));
             } catch (RuntimeException ex) {
                 prefs.edit().putBoolean("redirect_home", false).putString("redirect_notice", "O sistema recusou a abertura do Aurora em segundo plano. Redirecionamento desativado.").apply();
             }

@@ -22,6 +22,7 @@ public class MainActivity extends Activity {
     private LinearLayout page, menu;
     private String section = "Início", query = "";
     private View firstCard;
+    private boolean reuseHomeOnResume, externalAppOpened;
     private int accent = Color.rgb(139, 197, 255);
     private static final int WHITE = 0xfff3f6fc, MUTED = 0xff9aa8bc;
 
@@ -40,8 +41,13 @@ public class MainActivity extends Activity {
         super.onResume();
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN
             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        discoverApps();
-        render();
+        boolean reuse = reuseHomeOnResume && page != null;
+        reuseHomeOnResume = false;
+        externalAppOpened = false;
+        if (!reuse) {
+            discoverApps();
+            render();
+        }
     }
     @Override protected void onSaveInstanceState(Bundle state) {
         state.putString("section", section);
@@ -49,7 +55,10 @@ public class MainActivity extends Activity {
     }
     @Override protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        reuseHomeOnResume = intent.getBooleanExtra("aurora_home_redirect", false)
+            && "Início".equals(section) && page != null && !externalAppOpened;
         section = "Início"; query = "";
+        if (intent.getBooleanExtra("aurora_home_redirect", false)) overridePendingTransition(0, 0);
     }
     private int dp(float n) { return (int)(n * getResources().getDisplayMetrics().density + .5f); }
     private void discoverApps() {
@@ -210,6 +219,7 @@ public class MainActivity extends Activity {
     private void launch(App a) {
         try {
             startActivity(a.intent);
+            externalAppOpened = true;
             prefs.edit().putString("recent", RecentApps.record(prefs.getString("recent", ""), a.pkg)).apply();
         } catch (RuntimeException e) { Toast.makeText(this, "Não foi possível abrir " + a.name, Toast.LENGTH_LONG).show(); }
     }
@@ -223,7 +233,7 @@ public class MainActivity extends Activity {
         }).show();
     }
     private void safeStart(Intent intent) {
-        try { startActivity(intent); } catch (RuntimeException e) { Toast.makeText(this, "Esta opção não está disponível nesta versão do sistema.", Toast.LENGTH_LONG).show(); }
+        try { startActivity(intent); externalAppOpened = true; } catch (RuntimeException e) { Toast.makeText(this, "Esta opção não está disponível nesta versão do sistema.", Toast.LENGTH_LONG).show(); }
     }
     private void settings() {
         new AlertDialog.Builder(this).setTitle("Aurora TV").setItems(new String[]{"Configurações do dispositivo", "Escolher app de início", "Limpar apps recentes", "Botão Home e inicialização", "Sobre"}, (d, which) -> {
@@ -231,7 +241,7 @@ public class MainActivity extends Activity {
             else if (which == 1) safeStart(new Intent(Settings.ACTION_HOME_SETTINGS));
             else if (which == 2) { prefs.edit().remove("recent").apply(); render(); }
             else if (which == 3) redirectSettings();
-            else new AlertDialog.Builder(this).setTitle("Aurora TV · 0.2.0")
+            else new AlertDialog.Builder(this).setTitle("Aurora TV · 0.2.1")
                 .setMessage("Uma tela inicial leve, privada e sem anúncios.\n\nFavoritos e apps recentes ficam somente neste dispositivo.\n\nAlgumas versões do Fire OS bloqueiam a troca do launcher e o botão Home. O Aurora não altera nem desativa o launcher da Amazon.")
                 .setPositiveButton("Entendi", null).show();
         }).show();
