@@ -48,3 +48,5 @@ Build, 13 verificações Java, Android Lint e publicação da 0.2.0 aprovados na
 ## 0.2.1 — latência experimental
 
 Os nove testes de RedirectGuard cobrem os novos limites de 349/350 ms, três tentativas em 15 s e pausa na quarta. Manter teste físico do Home após espera e em sequência, retorno de apps, atualização de Recentes e retorno de outras seções ao Início. Ainda sem medida de ganho no aparelho.
+
+Build, testes e Android Lint da 0.2.1 aprovados na [execução 39811733790](https://github.com/HERCULESxp/aurora-tv/actions/runs/39811733790). Ganho de tempo ainda não medido no Fire Stick.

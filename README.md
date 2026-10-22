@@ -2,9 +2,9 @@
 
 Launcher Android para Fire TV, com interface em português, sem anúncios e sem rastreamento. Inspirado no layout de referência: menu lateral, destaque panorâmico, fundo escuro e fileiras de aplicativos. O destaque usa uma paisagem original desenhada no dispositivo.
 
-**Estado:** versão experimental 0.2.0 compilada, com 13 verificações Java e Android Lint aprovados. Ainda não testada em Fire Stick físico; funcionamento do redirecionamento depende do firmware.
+**Estado:** versão experimental 0.2.1 compilada, com 13 verificações Java e Android Lint aprovados. Ainda não testada em Fire Stick físico; funcionamento do redirecionamento depende do firmware.
 
-[Baixar APK 0.2.0](https://github.com/HERCULESxp/aurora-tv/releases/download/v0.2.0/aurora-tv-0.2.0.apk) · [Release](https://github.com/HERCULESxp/aurora-tv/releases/tag/v0.2.0) · [Build validado](https://github.com/HERCULESxp/aurora-tv/actions/runs/39807012550)
+[Baixar APK 0.2.1](https://github.com/HERCULESxp/aurora-tv/releases/download/v0.2.1/aurora-tv-0.2.1.apk) · [Release](https://github.com/HERCULESxp/aurora-tv/releases/tag/v0.2.1) · [Build validado](https://github.com/HERCULESxp/aurora-tv/actions/runs/39811733790)
 
 Download público sem login. Para ativar Home e abertura ao ligar, veja [as instruções](docs/INSTALACAO.md#modo-experimental-home--inicialização-020).
 
@@ -16,7 +16,7 @@ Download público sem login. Para ativar Home e abertura ao ligar, veja [as inst
 - Últimos 12 aplicativos abertos pelo Aurora, salvos localmente.
 - Busca por nome, relógio e acesso às configurações do sistema.
 - Registro como aplicativo HOME e como app de TV.
-- 0.2.0: redirecionamento opcional da janela inicial Amazon via acessibilidade, proteção contra ciclos e tentativa opcional de abertura ao ligar.
+- 0.2.1: redirecionamento opcional da janela inicial Amazon via acessibilidade, proteção contra ciclos e tentativa opcional de abertura ao ligar.
 - Sem permissão de internet, anúncios, analytics ou dependência de serviços Google.
 
 O Aurora não agrega catálogos de streaming, não reproduz filmes e não acessa o progresso privado de Netflix, Prime Video ou outros serviços. “Recentes” lista apps abertos pelo launcher, não episódios assistidos. Os ícones vêm dos aplicativos instalados. A imagem de referência não é distribuída no projeto.
