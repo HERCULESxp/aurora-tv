@@ -1,4 +1,4 @@
-# Aurora 0.3.0 — instalação / método Homestead
+# Aurora 0.3.1 — instalação / método Homestead
 
 Android/Fire OS API 22+. Não funciona em Vega OS. Nenhum comando desativa o launcher Amazon.
 

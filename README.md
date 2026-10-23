@@ -2,7 +2,7 @@
 
 Launcher para Fire TV com o visual original do Aurora: menu lateral, paisagem escura, cartões de aplicativos, favoritos, busca e histórico local. Sem anúncios ou permissão de internet.
 
-## 0.3.0 — método Homestead
+## 0.3.1 — método Homestead
 
 O mecanismo anterior de redirecionamento foi removido. A nova implementação adapta somente a substituição visual da tela inicial do [Homestead](https://github.com/Sarg338/Homestead):
 
@@ -15,7 +15,9 @@ O mecanismo anterior de redirecionamento foi removido. A nova implementação ad
 
 O código não captura nem bloqueia a tecla Home diretamente. Não inclui design, VPN, túnel ADB, debloat, ajustes do sistema nem atualizador do Homestead. `WRITE_SECURE_SETTINGS` não é necessário para a detecção antecipada e não foi solicitado.
 
-**Experimental: a adaptação 0.3.0 ainda precisa ser testada no Fire Stick.** O tempo relatado pelo Homestead não é uma medição do Aurora. Confira a execução de CI antes de instalar.
+**Experimental: a adaptação 0.3.1 ainda precisa ser testada no Fire Stick.** O tempo relatado pelo Homestead não é uma medição do Aurora. Build, 21 verificações Java e Android Lint passaram (exceto o check de target expirado explicitamente excluído).
+
+[Baixar APK 0.3.1](https://github.com/HERCULESxp/aurora-tv/releases/download/v0.3.1/aurora-tv-0.3.1.apk) · [Build validado](https://github.com/HERCULESxp/aurora-tv/actions/runs/39958908967)
 
 [Instalação e comandos](docs/INSTALACAO.md) · [Testes](docs/TESTES.md) · [Releases](https://github.com/HERCULESxp/aurora-tv/releases)
 

@@ -1,4 +1,4 @@
-# Validação 0.3.0
+# Validação 0.3.1
 
 ## Local
 
@@ -24,3 +24,5 @@ Não executado nesta sessão. Compilação e testes de lógica não comprovam fu
 8. Reiniciar o dispositivo com modo Home ligado/desligado e com serviço habilitado/desabilitado.
 9. Confirmar aparência Aurora, sem importar telas do Homestead.
 10. Conferir instalação limpa e eventual conflito de assinatura ao atualizar versões debug anteriores.
+
+Execução validada: https://github.com/HERCULESxp/aurora-tv/actions/runs/39958908967 — testes, assembleDebug, lintDebug e publicação concluídos com sucesso.
