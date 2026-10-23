@@ -40,6 +40,8 @@ public class AuroraHome extends android.view.ContextThemeWrapper {
     final FrameLayout root;
     private final Host host;
     private final boolean overlay;
+    private boolean inputBlocked;
+    void blockInput(boolean block) { inputBlocked = block; }
     private final List<AlertDialog> dialogs = new ArrayList<>();
     AuroraHome(android.content.Context context, Host host, boolean overlay) {
         super(context, R.style.AppTheme);
@@ -48,6 +50,7 @@ public class AuroraHome extends android.view.ContextThemeWrapper {
         prefs = getSharedPreferences("aurora", MODE_PRIVATE);
         root = new FrameLayout(this) {
             @Override public boolean dispatchKeyEvent(KeyEvent event) {
+                if (inputBlocked) return true;
                 if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
                     if (event.getAction() == KeyEvent.ACTION_UP) back();
                     return true;
@@ -299,7 +302,7 @@ public class AuroraHome extends android.view.ContextThemeWrapper {
                 if (amazon != null) safeStart(amazon);
                 else safeStart(new Intent(Settings.ACTION_SETTINGS));
             } else if (which == 3) { prefs.edit().remove("recent").apply(); render(); }
-            else dialog().setTitle("Aurora TV · 0.3.0")
+            else dialog().setTitle("Aurora TV · 0.3.1")
                 .setMessage("Interface Aurora. Mecanismo Home adaptado do Homestead, GPL-3.0-or-later. Sem anúncios e sem internet. O modo antecipado usa READ_LOGS para reconhecer apenas inícios HOME, sem salvar logs.")
                 .setPositiveButton("OK", null).show();
         }).show();

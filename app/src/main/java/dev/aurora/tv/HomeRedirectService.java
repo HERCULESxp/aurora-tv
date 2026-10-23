@@ -159,7 +159,8 @@ public class HomeRedirectService extends AccessibilityService {
         catch (RuntimeException e) { close(); }
     }
     private void pick(Intent intent, boolean settings) {
-        if (!session.active()) return;
+        if (!session.active() || session.picked()) return;
+        ui.blockInput(true);
         session.pick(); cancelOpen();
         if (pendingHide != null) { handler.removeCallbacks(pendingHide); pendingHide = null; }
         suspended = settings;
@@ -185,7 +186,10 @@ public class HomeRedirectService extends AccessibilityService {
             ui.closeDialogs();
             if (ui.root.getParent() != null) try { wm.removeViewImmediate(ui.root); } catch (RuntimeException ignored) { }
         }
+        ui = null;
         dialogOpen = false; closing = false;
+        // Rebuild off the critical HOME path, including freshly changed favorites/history.
+        handler.postDelayed(() -> { if (instance == this && enabled() && !session.active()) prepareUi(); }, 250);
     }
     @Override public void onAccessibilityEvent(AccessibilityEvent event) {
         if (event == null || event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED || event.getPackageName() == null) return;
