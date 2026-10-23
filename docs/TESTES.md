@@ -1,52 +1,26 @@
-# Validação
+# Validação 0.3.0
 
-## Executado neste ambiente
+## Local
 
-- Teste Java do histórico: primeira abertura, reabertura sem duplicata, limpeza de entradas vazias/duplicadas e limite dos últimos 12 apps.
-- Leitura sintática dos recursos e manifesto XML, workflow YAML e fontes Java (sem resolução de tipos Android).
-- Revisão de compatibilidade com API 22: ordenação usa `Collections.sort`, evitando `List.sort` de API 24.
+`./tests/run.sh`: quatro verificações de Recentes e 17 do novo mecanismo. Inclui HOME normal/root/app, rejeição de backlog, usuário diferente, evento que não é HOME, timestamp inválido/NaN, UID inválido; cancelamento de handoff por seleção e invalidação de callbacks antigos por epoch.
 
-## Executado no GitHub Actions
+O antigo RedirectGuard e seus testes foram removidos junto com a implementação anterior. O parsing do observador foi extraído do Homestead e endurecido para rejeitar timestamps inválidos.
 
-[Execução aprovada](https://github.com/HERCULESxp/aurora-tv/actions/runs/39790290844), commit `e4775710292b6219b0059eed1bec87eeb0c7d6f5`:
+## CI
 
-- Quatro verificações do histórico aprovadas.
-- `:app:assembleDebug` e `:app:lintDebug` concluídos com sucesso.
-- APK debug gerado e publicado como artefato `aurora-tv-debug`.
+O workflow da Release executa testes Java, `assembleDebug` e `lintDebug` antes de publicar o APK. A exceção de target SDK expirado é documentada em app/build.gradle; nenhum outro erro de lint é ignorado.
 
-Foram corrigidos o pacote obsoleto `tools` na instalação do SDK e o atributo `windowLightStatusBar`, incompatível com API 22.
+## Obrigatório no Fire Stick
 
-## Ainda não executado
+Não executado nesta sessão. Compilação e testes de lógica não comprovam funcionamento de janelas/controle no Fire OS.
 
-Não foi verificado o layout em emulador nem o funcionamento em Fire TV. Lint aprovado não substitui teste no aparelho.
-
-## Roteiro para aparelho / emulador
-
-1. Compilar e executar `gradle :app:assembleDebug :app:lintDebug`.
-2. Instalar em API 22 e em Android atual, além do modelo Fire TV alvo.
-3. Conferir a tela em 720p e 1080p, margens, textos e foco.
-4. Navegar por todos os itens somente com direcional, OK e Voltar; testar rolagem horizontal e vertical.
-5. Abrir apps com entrada Leanback e Launcher comum; confirmar retorno ao Aurora.
-6. Favoritar pelo OK pressionado e Menu; encerrar e reabrir para confirmar persistência.
-7. Abrir mais de 12 apps e conferir ordem e limite de Recentes.
-8. Buscar termos existentes e inexistentes com teclado virtual; voltar à lista.
-9. Instalar/desinstalar outro app e retornar ao Aurora; conferir atualização da lista.
-10. Testar Configurações e Escolher app de início, incluindo versões que não oferecem esse seletor.
-11. Confirmar comportamento do botão Home no Fire OS, sem desativar o launcher original.
-12. Limpar histórico e conferir estado vazio.
-
-
-## Validação adicional 0.2.0
-
-- Teste `RedirectGuardTest`: nove verificações cobrindo recurso desligado, janela não reconhecida, intervalo mínimo, limite de tentativas e recuperação após a janela de tempo.
-- No aparelho: habilitar/desabilitar o serviço; conferir diagnóstico; pressionar Home de apps diferentes; confirmar que configurações Amazon não causam redirecionamento; testar pausa por repetição; reiniciar com abertura ao ligar ligada/desligada; testar recuperação por force-stop.
-- Ainda não validado em Fire Stick físico. Serviço habilitado não comprova que o firmware permite abertura em segundo plano.
-
-Build, 13 verificações Java, Android Lint e publicação da 0.2.0 aprovados na [execução 39807012550](https://github.com/HERCULESxp/aurora-tv/actions/runs/39807012550), commit `b03a6a60ba69b36be430c97a917877f44baee3cb`.
-
-
-## 0.2.1 — latência experimental
-
-Os nove testes de RedirectGuard cobrem os novos limites de 349/350 ms, três tentativas em 15 s e pausa na quarta. Manter teste físico do Home após espera e em sequência, retorno de apps, atualização de Recentes e retorno de outras seções ao Início. Ainda sem medida de ganho no aparelho.
-
-Build, testes e Android Lint da 0.2.1 aprovados na [execução 39811733790](https://github.com/HERCULESxp/aurora-tv/actions/runs/39811733790). Ganho de tempo ainda não medido no Fire Stick.
+1. Ativar acessibilidade e READ_LOGS, abrir o Aurora e conferir diagnóstico.
+2. Testar Home de um app, da Amazon e do próprio Aurora, incluindo pressões repetidas.
+3. Navegar pelos cartões, favoritos e busca enquanto a janela está ativa; conferir seção/foco/rolagem durante a passagem para a atividade.
+4. Escolher um app antes e depois do handoff; confirmar que o Aurora não abre novamente por callback antigo.
+5. Abrir configurações e Amazon Home, permanecer nelas e retornar por Home.
+6. Conferir encerramento da janela se atividade/app falhar, interrupção do serviço, force-stop e desativação do modo Home.
+7. Revogar READ_LOGS e testar fallback por janela; conceder novamente e reconectar.
+8. Reiniciar o dispositivo com modo Home ligado/desligado e com serviço habilitado/desabilitado.
+9. Confirmar aparência Aurora, sem importar telas do Homestead.
+10. Conferir instalação limpa e eventual conflito de assinatura ao atualizar versões debug anteriores.

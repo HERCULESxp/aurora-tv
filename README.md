@@ -1,63 +1,45 @@
 # Aurora TV
 
-Launcher Android para Fire TV, com interface em português, sem anúncios e sem rastreamento. Inspirado no layout de referência: menu lateral, destaque panorâmico, fundo escuro e fileiras de aplicativos. O destaque usa uma paisagem original desenhada no dispositivo.
+Launcher para Fire TV com o visual original do Aurora: menu lateral, paisagem escura, cartões de aplicativos, favoritos, busca e histórico local. Sem anúncios ou permissão de internet.
 
-**Estado:** versão experimental 0.2.1 compilada, com 13 verificações Java e Android Lint aprovados. Ainda não testada em Fire Stick físico; funcionamento do redirecionamento depende do firmware.
+## 0.3.0 — método Homestead
 
-[Baixar APK 0.2.1](https://github.com/HERCULESxp/aurora-tv/releases/download/v0.2.1/aurora-tv-0.2.1.apk) · [Release](https://github.com/HERCULESxp/aurora-tv/releases/tag/v0.2.1) · [Build validado](https://github.com/HERCULESxp/aurora-tv/actions/runs/39811733790)
+O mecanismo anterior de redirecionamento foi removido. A nova implementação adapta somente a substituição visual da tela inicial do [Homestead](https://github.com/Sarg338/Homestead):
 
-Download público sem login. Para ativar Home e abertura ao ligar, veja [as instruções](docs/INSTALACAO.md#modo-experimental-home--inicialização-020).
+- Observador separado `:homekey` procura inícios HOME no log, com `READ_LOGS` concedido pelo usuário.
+- Janela de acessibilidade mostra a **interface navegável do Aurora**, sem aguardar a atividade abrir.
+- A atividade assume após aproximadamente 5,2 segundos, preservando seção, foco e rolagem.
+- Escolher um app cancela a troca pendente para o Aurora. A janela tem limite de duração e limpeza ao interromper o serviço.
+- Eventos de janela funcionam como fallback sem `READ_LOGS`.
+- Configurações/Amazon Home suspendem a detecção por janela. Voltar ao Aurora ou um HOME reconhecido no log retoma.
 
-## Funcionalidades
+O código não captura nem bloqueia a tecla Home diretamente. Não inclui design, VPN, túnel ADB, debloat, ajustes do sistema nem atualizador do Homestead. `WRITE_SECURE_SETTINGS` não é necessário para a detecção antecipada e não foi solicitado.
 
-- Descobre e abre os apps instalados, priorizando atividades para TV.
-- Navegação com direcional, OK, Voltar e Menu do controle remoto.
-- Favoritos persistentes: segure OK em um cartão ou pressione Menu.
-- Últimos 12 aplicativos abertos pelo Aurora, salvos localmente.
-- Busca por nome, relógio e acesso às configurações do sistema.
-- Registro como aplicativo HOME e como app de TV.
-- 0.2.1: redirecionamento opcional da janela inicial Amazon via acessibilidade, proteção contra ciclos e tentativa opcional de abertura ao ligar.
-- Sem permissão de internet, anúncios, analytics ou dependência de serviços Google.
+**Experimental: a adaptação 0.3.0 ainda precisa ser testada no Fire Stick.** O tempo relatado pelo Homestead não é uma medição do Aurora. Confira a execução de CI antes de instalar.
 
-O Aurora não agrega catálogos de streaming, não reproduz filmes e não acessa o progresso privado de Netflix, Prime Video ou outros serviços. “Recentes” lista apps abertos pelo launcher, não episódios assistidos. Os ícones vêm dos aplicativos instalados. A imagem de referência não é distribuída no projeto.
+[Instalação e comandos](docs/INSTALACAO.md) · [Testes](docs/TESTES.md) · [Releases](https://github.com/HERCULESxp/aurora-tv/releases)
 
-## Gerar o APK
+## Compilar
 
-### GitHub Actions
-
-Envie o projeto para o GitHub. Em **Actions → Android APK**, execute o workflow ou aguarde a execução iniciada pelo push. Após o sucesso, baixe o artefato `aurora-tv-debug`, descompacte e use `app-debug.apk`.
-
-O artefato é um APK de desenvolvimento. A chave debug do runner pode mudar entre execuções; para atualizações permanentes, configure uma chave de assinatura própria, guardada fora do repositório. Uma assinatura diferente exige desinstalar a versão anterior, apagando suas preferências.
-
-### Android Studio / terminal
-
-Requer JDK 17, Gradle 8.9 e Android SDK 35. Abra a pasta no Android Studio ou configure `ANDROID_HOME` para seu SDK e execute:
+JDK 17, Gradle 8.9, Android SDK 35. Sem Gradle Wrapper incluído:
 
 ```sh
 gradle :app:assembleDebug :app:lintDebug
-```
-
-APK: `app/build/outputs/apk/debug/app-debug.apk`.
-
-Este projeto não inclui Gradle Wrapper; instale Gradle 8.9 ou gere o wrapper com `gradle wrapper --gradle-version 8.9` antes de usar `./gradlew`. O CI provisiona a versão especificada automaticamente.
-
-Teste independente do Android SDK:
-
-```sh
 ./tests/run.sh
 ```
 
-## Instalar no Fire Stick
+APK: `app/build/outputs/apk/debug/app-debug.apk`. O CI também publica artefatos. Para gerar wrapper localmente: `gradle wrapper --gradle-version 8.9`.
 
-Veja [o guia de instalação](docs/INSTALACAO.md). O APK exige um dispositivo Android/Fire OS com API 22 ou superior. Dispositivos com Vega OS não executam este APK.
+`minSdk 22`; `targetSdk 28` acompanha a estratégia Homestead para permissões de abertura em segundo plano. Distribuição por sideload; não preparada para Google Play. Apenas o lint de target expirado é excluído com justificativa; os outros checks permanecem ativos.
 
-**Instalar o app não garante substituir o botão Home.** A Amazon bloqueia launchers alternativos em diversas versões do Fire OS. O Aurora registra a intenção HOME padrão do Android e oferece redirecionamento experimental via acessibilidade. Esse método depende de o Fire OS permitir o serviço e a abertura de atividades; não remove os bloqueios do sistema. Não desative nem desinstale o launcher da Amazon para experimentar este projeto.
+**Assinatura:** estes APKs ainda são debug, com chaves diferentes por runner. Uma atualização pode exigir desinstalar a versão anterior, perdendo configurações e autorizações. A chave privada de uma versão anterior não pode ser recuperada do APK. Uma assinatura permanente para futuras atualizações exige provisionar a chave fora do repositório público.
 
-## Estrutura
+## Privacidade
 
-- `MainActivity.java`: interface nativa e integração com os aplicativos.
-- `RecentApps.java`: histórico limitado e sem duplicatas.
-- `.github/workflows/android.yml`: compilação, lint e artefato APK.
-- `docs/TESTES.md`: validações executadas e roteiro no aparelho.
+A acessibilidade observa nomes de janelas, não seu conteúdo, e não filtra teclas. `READ_LOGS` é uma permissão ampla do Android; nosso observador filtra os tags `ActivityManager`/`ActivityTaskManager` do buffer `system`, usa apenas timestamp e UID de inícios HOME e descarta o texto sem salvá-lo ou enviá-lo. O observador é desligado junto com o modo Home. Sem a permissão, fica apenas o fallback de acessibilidade.
 
-Java com APIs nativas mantém o aplicativo pequeno e dispensa WebView e bibliotecas de UI. Favoritos são ordenados alfabeticamente. O histórico considera somente apps abertos pelo Aurora. A descoberta é atualizada ao retornar à tela inicial.
+Favoritos e Recentes ficam no dispositivo. Recentes são apps abertos pelo Aurora, não episódios assistidos. Não há integração com catálogos de streaming.
+
+## Licença
+
+GPL-3.0-or-later. Código Home adaptado do Homestead com atribuição em [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) e [LICENSE](LICENSE). O restante mantém a interface Aurora.

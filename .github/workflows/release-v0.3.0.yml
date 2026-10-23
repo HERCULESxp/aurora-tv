@@ -1,0 +1,61 @@
+name: Publish v0.3.0
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/release-v0.3.0.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools platforms;android-35 build-tools;34.0.0
+          log-accepted-android-sdk-licenses: false
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - run: ./tests/run.sh
+      - run: gradle --no-daemon :app:assembleDebug :app:lintDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aurora-tv-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Publish tested APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: HERCULESxp/aurora-tv
+        run: |
+          mkdir -p release
+          cp app/build/outputs/apk/debug/app-debug.apk release/aurora-tv-0.3.0.apk
+          cd release
+          sha256sum aurora-tv-0.3.0.apk > SHA256SUMS.txt
+          cat > notes.md <<'NOTES'
+          Mecanismo Home antigo substituído por adaptação do Homestead, mantendo o design do Aurora.
+
+          READ_LOGS detecta inícios HOME antes do evento de janela. O Aurora aparece como janela de acessibilidade navegável e transfere para a atividade após cerca de 5,2 s. Não inclui VPN, ADB local, debloat ou interface do Homestead.
+
+          No shell conectado ao Fire Stick: pm grant dev.aurora.tv android.permission.READ_LOGS
+          Habilite também dev.aurora.tv/dev.aurora.tv.HomeRedirectService, preservando os demais serviços de acessibilidade. Abra o app e confira Configurações → Home — método Homestead.
+
+          Experimental: build, testes Java e lint aprovados antes da publicação, mas sem teste físico desta adaptação. Não há garantia de tempo de resposta. targetSdk 28 conforme a estratégia de abertura do Homestead.
+
+          APK debug: pode exigir desinstalar a versão antiga por assinatura incompatível, apagando preferências e permissões. A assinatura permanente continua pendente.
+
+          Código adaptado de Sarg338/Homestead, Copyright (C) 2026 Homestead contributors, GPL-3.0-or-later. Código-fonte completo nesta tag, LICENSE e THIRD_PARTY_NOTICES.md. Sem garantia.
+
+          Guia: https://github.com/HERCULESxp/aurora-tv/blob/main/docs/INSTALACAO.md
+          NOTES
+          if gh release view v0.3.0 >/dev/null 2>&1; then
+            echo 'Release already exists; leaving it unchanged.'
+            exit 0
+          fi
+          gh release create v0.3.0 aurora-tv-0.3.0.apk SHA256SUMS.txt --target "$GITHUB_SHA" --title 'Aurora TV v0.3.0 — Método Homestead (experimental)' --notes-file notes.md --prerelease

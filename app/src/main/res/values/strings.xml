@@ -1,4 +1,4 @@
 <resources>
-    <string name="home_service_label">Aurora — redirecionar início</string>
-    <string name="home_service_description">Quando ativado no Aurora, detecta a atividade de início da Amazon e abre o Aurora. Observa somente o nome do pacote e da janela, sem ler textos da tela, teclas ou conteúdo de outros apps. Não envia dados. Pode ser desativado a qualquer momento nas configurações do Aurora ou de acessibilidade.</string>
+    <string name="home_service_label">Aurora — Home Homestead</string>
+    <string name="home_service_description">Exibe a interface Aurora em uma janela de acessibilidade ao detectar Home e transfere para o aplicativo depois. Observa nomes das janelas para remover a cobertura quando outro app abre; não lê seu conteúdo nem captura teclas. Com READ_LOGS concedido por ADB, um processo separado procura apenas inícios HOME no log de atividades, sem salvar ou enviar logs. Desligue em Home — método Homestead no Aurora.</string>
 </resources>

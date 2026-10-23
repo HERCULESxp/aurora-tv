@@ -1,108 +1,80 @@
-# Instalação no Fire TV
+# Aurora 0.3.0 — instalação / método Homestead
 
-## 1. Confira o aparelho
+Android/Fire OS API 22+. Não funciona em Vega OS. Nenhum comando desativa o launcher Amazon.
 
-Em Configurações → Meu Fire TV → Sobre, confira modelo e versão do sistema. Este projeto é um APK Android para Fire OS; não funciona em Vega OS. A compatibilidade real deve ser validada no seu modelo.
+## Instalar
 
-## 2. Instale por ADB
+Baixe o APK na Release. Se a instalação sobre a versão anterior mostrar assinatura incompatível, desinstale o Aurora antigo e instale o novo. Isso apaga favoritos, histórico e permissões. Os APKs atuais usam assinatura debug; uma chave estável ainda não foi provisionada.
 
-No computador, instale Android SDK Platform Tools pelo site oficial do Android. No Fire TV, habilite as opções de desenvolvedor (em alguns modelos, selecione o nome do dispositivo sete vezes na tela Sobre) e ative Depuração ADB. Os nomes dos menus variam por versão.
+Abra o Aurora uma vez. O serviço mantém o mesmo componente `dev.aurora.tv/dev.aurora.tv.HomeRedirectService`, mas foi reescrito. As antigas opções de redirecionamento, inicialização e pausa não controlam esta versão.
 
-Conecte computador e Fire TV à mesma rede confiável. Substitua `IP_DO_FIRE_TV` pelo endereço mostrado no aparelho:
+## Ativar usando o shell ADB do celular
 
-```sh
-adb connect IP_DO_FIRE_TV:5555
-```
-
-Aceite a autorização exibida na TV. Depois execute:
+Estes comandos são executados **no shell conectado ao Fire Stick**, sem prefixo `adb shell`:
 
 ```sh
-adb install -r app-debug.apk
-adb shell am start -n dev.aurora.tv/.MainActivity
+settings get secure enabled_accessibility_services
+settings get secure accessibility_enabled
 ```
 
-O Aurora também deve aparecer na lista de aplicativos do Fire TV. Se não aparecer imediatamente, abra-o usando o comando acima.
-
-## 3. Usar como tela inicial
-
-Dentro do Aurora, vá a Configurações → Escolher app de início. Se o sistema oferecer um seletor, escolha Aurora TV. Em Android TV compatível, o sistema também pode apresentar essa escolha ao pressionar Home.
-
-Muitas versões do Fire OS impedem essa seleção e reservam o botão Home para o launcher Amazon. Nesses casos, o Aurora pode ser aberto como aplicativo, mas o botão Home continua levando à Amazon. A partir da versão 0.2.0, existe um serviço de acessibilidade opcional para redirecionar a janela inicial da Amazon. Ele não remapeia fisicamente Home, não executa ADB em segundo plano e não modifica pacotes do sistema.
-
-Não há procedimento universal de substituição seguro para todos os Fire Sticks. Antes de qualquer ajuste específico, identifique o modelo e a versão exata do Fire OS. Não desative o launcher original: isso pode deixar o dispositivo sem tela inicial funcional.
-
-## Controle remoto
-
-| Botão | Ação |
-|---|---|
-| Direcional | Mover o foco e navegar nas fileiras |
-| OK | Abrir app ou selecionar opção |
-| OK pressionado / Menu (☰) | Favoritar ou ver informações do app |
-| Voltar | Voltar ao início; no início, focar menu lateral |
-| Home | Comportamento definido pelo Fire OS |
-
-## Remover
-
-Use as configurações do Fire TV ou:
+Guarde ambos os valores para restauração. **Somente se a lista estiver vazia ou retornar `null`**, execute:
 
 ```sh
-adb uninstall dev.aurora.tv
+settings put secure enabled_accessibility_services dev.aurora.tv/dev.aurora.tv.HomeRedirectService
+settings put secure accessibility_enabled 1
 ```
 
-A desinstalação remove favoritos e histórico. Desative a Depuração ADB quando terminar.
+Se houver outros serviços, acrescente `:dev.aurora.tv/dev.aurora.tv.HomeRedirectService` à lista atual, sem duplicar nem remover entradas. Desative antes outros apps de redirecionamento Home, como Home on Fire, para não competirem.
 
-
-## Modo experimental Home / inicialização (0.2.0)
-
-1. Instale a versão 0.2.0 e abra o Aurora ao menos uma vez.
-2. Acesse **Configurações → Botão Home e inicialização → Ativar redirecionamento Home** e leia a explicação.
-3. Na acessibilidade do sistema, habilite **Aurora — redirecionar início**, caso a opção esteja disponível. Ativar somente o botão interno do Aurora não habilita o serviço no sistema.
-4. Volte ao Aurora e abra **Ver estado e diagnóstico**. Serviço habilitado e início da Amazon identificado são pré-condições, não garantia de funcionamento.
-5. Pressione Home. A Amazon pode aparecer brevemente antes de o Aurora abrir.
-6. Opcionalmente ative **Abrir Aurora ao ligar** e reinicie para testar. Fire OS pode bloquear a abertura em segundo plano ou atrasar a conexão do serviço. Forçar parada do app também pode impedir eventos de inicialização até ele ser aberto novamente.
-
-O serviço observa somente eventos de mudança de janela do pacote `com.amazon.tv.launcher`, e só reage às classes de atividade registradas como HOME desse pacote. Não lê árvores de interface, textos de tela, teclas, credenciais ou conteúdo de outros aplicativos. Sem internet ou envio de eventos. Uma variante do firmware que reporte outra janela pode não ser reconhecida; não há fallback que intercepte indiscriminadamente o pacote todo.
-
-O redirecionamento tem intervalo mínimo de 350 ms (desde a versão 0.2.1). Após três tentativas em 15 segundos, uma quarta tentativa pausa o recurso. Se Home deixar de redirecionar após várias pressões rápidas, confira o diagnóstico e reative a opção. Essa proteção também evita ciclos se o Fire OS reabrir insistentemente a Amazon.
-
-### Desativar / recuperar
-
-No Aurora, desligue **Redirecionamento Home** e **Abertura ao ligar**. Também é possível desabilitar o serviço na acessibilidade do sistema. Se necessário, a partir de um computador já autorizado:
+Para a detecção antecipada do Homestead:
 
 ```sh
-adb shell am force-stop dev.aurora.tv
+pm grant dev.aurora.tv android.permission.READ_LOGS
+am force-stop dev.aurora.tv
+am start -n dev.aurora.tv/.MainActivity
 ```
 
-Isso interrompe o Aurora, sem remover o launcher Amazon. Para remover totalmente:
+O reinício do processo após o grant assegura a aplicação da permissão. Abra **Configurações → Home — método Homestead → Diagnóstico e ativação**. O modo Home deve estar ligado, o serviço conectado, READ_LOGS concedido e o observador conectado. Caso force-stop deixe o serviço desconectado, habilite novamente o componente na lista de acessibilidade, preservando os outros serviços.
+
+Teste Home estando em outro app e estando na Amazon. A interface do Aurora deve aparecer como janela navegável; após cerca de 5,2 s a atividade assume. A inicialização de um app escolhido durante esse período também pode esperar o bloqueio do Fire OS terminar. Não há promessa de 170 ms para o Aurora.
+
+**Não execute o comando WRITE_SECURE_SETTINGS do Homestead no Aurora:** a permissão não é necessária para este recorte e não está declarada.
+
+## Configurações / Amazon
+
+Use **Configurações do dispositivo** ou **Abrir Amazon Home** no menu do Aurora. O mecanismo fica suspenso durante essa saída. Voltar ao Aurora ou um novo Home reconhecido pelo observador retoma; sem READ_LOGS, abra o Aurora manualmente. Se abrir configurações por outros caminhos e elas forem interrompidas, desligue o modo Home enquanto as usa.
+
+## Desligar e recuperar
+
+No Aurora: **Configurações → Home — método Homestead → Desligar substituição Home**. Isso remove a janela e desliga o observador de logs. O launcher permanece utilizável como app comum.
+
+Para interromper de imediato pelo shell:
 
 ```sh
-adb uninstall dev.aurora.tv
+am force-stop dev.aurora.tv
 ```
 
-Se o Fire OS ocultar ou bloquear o serviço de acessibilidade, informe o modelo e a versão completa do sistema para diagnóstico. Não execute comandos que substituam a lista inteira de serviços de acessibilidade: isso pode desabilitar recursos que você já usa. Não há garantia de contornar restrições do firmware somente com um APK.
+Para revogar a leitura do log:
 
-### Atualizar o APK de teste
+```sh
+pm revoke dev.aurora.tv android.permission.READ_LOGS
+am force-stop dev.aurora.tv
+am start -n dev.aurora.tv/.MainActivity
+```
 
-As versões de desenvolvimento podem ter certificados diferentes por serem geradas em runners distintos. Se ocorrer `INSTALL_FAILED_UPDATE_INCOMPATIBLE`, desinstale a versão anterior e instale a nova. Isso apaga favoritos, histórico e opções; será necessário habilitar o serviço novamente. Não desinstale o launcher da Amazon.
+Para remover totalmente:
 
+```sh
+pm uninstall dev.aurora.tv
+```
 
-## Comparar o tempo do Home na versão 0.2.1
+A janela também tem um limite de 15 segundos para não deixar o aparelho preso caso a atividade não abra. Nunca desative o launcher Amazon.
 
-A versão 0.2.1 remove a espera de agrupamento de 150 ms dos eventos de acessibilidade, reduz o intervalo mínimo entre tentativas de 2 s para 350 ms e reutiliza a tela inicial já montada quando possível. Retornos de aplicativos abertos pelo Aurora ainda atualizam a lista e o histórico. Não captura nem bloqueia a tecla Home.
+## Diagnóstico
 
-Teste Home após ficar 20 segundos parado e depois teste duas pressões separadas por 1 segundo. Compare com a 0.2.0. Evite muitas pressões seguidas: a proteção de três tentativas por 15 segundos continua ativa. Se pausar, reative pelo Aurora e espere 15 segundos antes do próximo teste.
+```sh
+dumpsys accessibility
+dumpsys activity activities | grep -E 'mResumedActivity|mFocusedActivity'
+```
 
-Também confira: Home estando na busca/favoritos retorna ao Início; abrir e voltar de outro aplicativo atualiza Recentes; configurações e boot continuam funcionando. O atraso do Fire OS ao emitir eventos não é removido por essas mudanças. A redução real precisa ser medida no aparelho.
-
-
-## Configurações do Fire TV — 0.2.2
-
-Abrir qualquer configuração pelo Aurora pausa o redirecionamento. A pausa não expira e não é removida simplesmente ao retornar ao app: escolha **Configurações → Retomar redirecionamento Home** quando terminar. Na primeira habilitação do serviço, abrir a acessibilidade também pausa Home; retome depois de habilitar. A abertura ao ligar respeita essa pausa.
-
-Para entrar nas configurações pelo menu nativo/controle remoto, escolha antes **Pausar Home para usar a Amazon**. Não é possível distinguir todas as páginas internas da Amazon somente pelo nome da atividade; esta versão não afirma detectar automaticamente essas páginas.
-
-### “App não instalado”
-
-Os APKs atuais usam assinatura debug gerada no runner. Builds diferentes podem usar certificados diferentes, impedindo atualização sobre o app instalado. Uma mensagem genérica não comprova a causa; instalação por ADB fornece o erro específico, por exemplo `INSTALL_FAILED_UPDATE_INCOMPATIBLE`.
-
-Nesse erro, é necessário desinstalar o antigo e instalar o novo, perdendo preferências e habilitação do serviço. Para atualizações futuras sem desinstalar, ainda é necessário configurar uma chave de assinatura permanente em armazenamento privado e usá-la no CI. Não coloque keystores ou senhas no repositório público. Esta versão corrige o acesso às configurações, mas não recupera as chaves debug de runners anteriores.
+Informe a tela de diagnóstico e o comportamento observado. Não envie o log completo do sistema: ele pode conter informações de outros aplicativos.

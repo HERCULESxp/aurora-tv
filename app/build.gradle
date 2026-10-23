@@ -5,10 +5,13 @@ android {
     defaultConfig {
         applicationId 'dev.aurora.tv'
         minSdk 22
-        targetSdk 35
-        versionCode 4
-        versionName '0.2.2'
+        targetSdk 28
+        versionCode 5
+        versionName '0.3.0'
     }
+    // Sideload-only Fire OS app: Homestead's activity handoff relies on API 28 behavior.
+    // Do not suppress other lint checks.
+    lint { disable 'ExpiredTargetSdkVersion' }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
